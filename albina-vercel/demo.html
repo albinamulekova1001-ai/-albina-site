@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Демо — AI-инструменты для продаж</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0a; --bg2: #111; --bg3: #171717;
+  --gold: #c8a96e; --gold2: #e8cc8a;
+  --white: #f0ebe3; --muted: #888074;
+  --border: rgba(200,169,110,0.15);
+  --green: #4ade80; --red: #f87171;
+}
+html, body { background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; }
+
+/* NAV */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--white); text-decoration: none; }
+.nav-back { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); text-decoration: none; border: 1px solid var(--border); padding: 8px 16px; transition: all 0.3s; }
+.nav-back:hover { border-color: var(--gold); background: rgba(200,169,110,0.08); }
+
+/* HERO */
+.demo-hero {
+  padding: 64px 32px 48px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.demo-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px,5vw,52px); font-weight: 400; line-height: 1.2; margin-bottom: 16px; }
+.demo-hero h1 em { font-style: italic; color: var(--gold); }
+.demo-hero p { font-size: 14px; color: var(--muted); max-width: 480px; margin: 0 auto; line-height: 1.8; }
+
+/* TABS */
+.tabs-wrap { display: flex; justify-content: center; gap: 0; padding: 32px 24px 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab-btn {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 14px 28px; border: none; background: none;
+  color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.25s; white-space: nowrap;
+}
+.tab-btn:hover { color: var(--white); }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* PANELS */
+.panel { display: none; padding: 40px 32px 60px; max-width: 860px; margin: 0 auto; }
+.panel.active { display: block; }
+
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 400;
+  margin-bottom: 8px;
+}
+.panel-sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; line-height: 1.7; }
+
+/* ── TOOL 1: SCRIPT GENERATOR ── */
+.script-form { display: flex; flex-direction: column; gap: 16px; }
+
+.field-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; display: block; }
+
+.field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+select, input, textarea {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+}
+select:focus, input:focus, textarea:focus { border-color: rgba(200,169,110,0.5); }
+select option { background: var(--bg2); }
+textarea { resize: vertical; min-height: 80px; }
+
+.btn-gen {
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  padding: 16px 32px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.3s;
+  align-self: flex-start;
+}
+.btn-gen:hover { background: var(--gold2); }
+.btn-gen:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.result-box {
+  margin-top: 28px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  padding: 24px;
+  display: none;
+  position: relative;
+}
+.result-box.show { display: block; }
+.result-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+.result-text { font-size: 13px; line-height: 1.9; color: var(--white); white-space: pre-wrap; }
+.copy-btn {
+  position: absolute; top: 16px; right: 16px;
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); background: none; border: 1px solid var(--border);
+  padding: 6px 12px; cursor: pointer; transition: all 0.2s;
+}
+.copy-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+.loading-dots { display: none; align-items: center; gap: 6px; padding: 12px 0; }
+.loading-dots.show { display: flex; }
+.dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+/* ── TOOL 2: LOSS CALCULATOR ── */
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.calc-input-col { display: flex; flex-direction: column; gap: 20px; }
+.calc-result-col {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 32px 24px;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 24px;
+}
+
+.range-wrap { position: relative; }
+input[type=range] {
+  -webkit-appearance: none;
+  background: none; border: none; padding: 0;
+  width: 100%; height: 4px;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 4px; background: var(--bg3); border-radius: 2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  background: var(--gold); border-radius: 50%;
+  margin-top: -7px; cursor: pointer;
+}
+.range-val { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); margin-top: 8px; }
+
+.result-metric { border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+.result-metric:last-child { border-bottom: none; padding-bottom: 0; }
+.metric-label { font-size: 11px; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
+.metric-val { font-family: 'Playfair Display', serif; font-size: 28px; }
+.metric-val.loss { color: var(--red); }
+.metric-val.gain { color: var(--green); }
+.metric-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ── TOOL 3: CHAT ── */
+.chat-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  height: 480px;
+}
+.chat-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.chat-avatar {
+  width: 36px; height: 36px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px; color: var(--bg); font-weight: 700;
+}
+.chat-header-info h4 { font-size: 13px; font-weight: 500; }
+.chat-header-info p { font-size: 10px; color: var(--green); letter-spacing: 1px; }
+
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: var(--bg2); }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--border); }
+
+.msg { max-width: 80%; }
+.msg-user { align-self: flex-end; }
+.msg-ai { align-self: flex-start; }
+
+.msg-bubble {
+  padding: 12px 16px;
+  font-size: 13px; line-height: 1.7;
+}
+.msg-user .msg-bubble { background: rgba(200,169,110,0.12); border: 1px solid rgba(200,169,110,0.2); color: var(--white); }
+.msg-ai .msg-bubble { background: var(--bg3); border: 1px solid var(--border); color: var(--white); }
+.msg-time { font-size: 10px; color: var(--muted); margin-top: 4px; text-align: right; }
+.msg-ai .msg-time { text-align: left; }
+
+.chat-input-row {
+  display: flex; gap: 0;
+  border-top: 1px solid var(--border);
+}
+.chat-input {
+  flex: 1; background: none; border: none;
+  padding: 16px 20px;
+  font-size: 13px; color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+}
+.chat-input::placeholder { color: var(--muted); }
+.chat-send {
+  background: var(--gold); border: none;
+  color: var(--bg); padding: 0 24px;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: background 0.2s; white-space: nowrap;
+}
+.chat-send:hover { background: var(--gold2); }
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.typing-indicator { display: none; align-items: center; gap: 4px; padding: 12px 16px; }
+.typing-indicator.show { display: flex; }
+.t-dot { width: 5px; height: 5px; background: var(--muted); border-radius: 50%; animation: pulse 1.2s infinite; }
+.t-dot:nth-child(2) { animation-delay: 0.2s; }
+.t-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* MOBILE */
+@media (max-width: 640px) {
+  nav { padding: 16px 20px; }
+  .demo-hero { padding: 48px 20px 36px; }
+  .panel { padding: 32px 20px 48px; }
+  .field-group { grid-template-columns: 1fr; }
+  .calc-grid { grid-template-columns: 1fr; }
+  .tabs-wrap { padding: 24px 16px 0; gap: 0; }
+  .tab-btn { padding: 12px 18px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Альбина</a>
+  <a href="/" class="nav-back">← Назад</a>
+</nav>
+
+<div class="demo-hero">
+  <h1>AI-инструменты<br><em>в действии</em></h1>
+  <p>Попробуй прямо сейчас — именно такие инструменты я создаю для отделов продаж</p>
+</div>
+
+<div class="tabs-wrap">
+  <button class="tab-btn active" onclick="switchTab('scripts')">✦ Генератор скриптов</button>
+  <button class="tab-btn" onclick="switchTab('calc')">✦ Калькулятор потерь</button>
+  <button class="tab-btn" onclick="switchTab('chat')">✦ AI-ассистент продаж</button>
+</div>
+
+<!-- ══ PANEL 1: SCRIPT GENERATOR ══ -->
+<div id="panel-scripts" class="panel active">
+  <h2 class="panel-title">Генератор скриптов продаж</h2>
+  <p class="panel-sub">Введи нишу и тип скрипта — получишь готовый скрипт для менеджера через несколько секунд</p>
+
+  <div class="script-form">
+    <div class="field-group">
+      <div>
+        <label class="field-label">Ниша / тип бизнеса</label>
+        <input type="text" id="niche" placeholder="Напр: ювелирный магазин, фитнес-клуб..." />
+      </div>
+      <div>
+        <label class="field-label">Тип скрипта</label>
+        <select id="script-type">
+          <option value="incoming">Входящий звонок / сообщение</option>
+          <option value="objection">Работа с возражением «дорого»</option>
+          <option value="followup">Follow-up после встречи</option>
+          <option value="upsell">Допродажа существующему клиенту</option>
+          <option value="cold">Холодное сообщение в WhatsApp</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="field-label">Дополнительный контекст (необязательно)</label>
+      <textarea id="context" placeholder="Напр: средний чек 15 000 руб, клиенты — женщины 30-50 лет..."></textarea>
+    </div>
+
+    <button class="btn-gen" id="gen-btn" onclick="generateScript()">Сгенерировать скрипт →</button>
+  </div>
+
+  <div class="loading-dots" id="script-loading">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <span style="font-size:12px;color:var(--muted);margin-left:8px;">Создаю скрипт...</span>
+  </div>
+
+  <div class="result-box" id="script-result">
+    <div class="result-label">Готовый скрипт</div>
+    <button class="copy-btn" onclick="copyScript()">Копировать</button>
+    <div class="result-text" id="script-output"></div>
+  </div>
+</div>
+
+<!-- ══ PANEL 2: CALCULATOR ══ -->
+<div id="panel-calc" class="panel">
+  <h2 class="panel-title">Калькулятор потерь без AI</h2>
+  <p class="panel-sub">Передвигай ползунки — увидишь сколько денег теряет бизнес из-за медленных ответов и рутины</p>
+
+  <div class="calc-grid">
+    <div class="calc-input-col">
+
+      <div>
+        <label class="field-label">Менеджеров в отделе продаж</label>
+        <input type="range" id="managers" min="1" max="20" value="5" oninput="calcLoss()">
+        <div class="range-val" id="managers-val">5 чел.</div>
+      </div>
+
+      <div>
+        <label class="field-label">Средняя зарплата менеджера (₽/мес)</label>
+        <input type="range" id="salary" min="40000" max="200000" step="5000" value="80000" oninput="calcLoss()">
+        <div class="range-val" id="salary-val">80 000 ₽</div>
+      </div>
+
+      <div>
+        <label class="field-label">% времени на рутину (шаблоны, КП, ответы)</label>
+        <input type="range" id="routine" min="10" max="80" value="50" oninput="calcLoss()">
+        <div class="range-val" id="routine-val">50%</div>
+      </div>
+
+      <div>
+        <label class="field-label">Кол-во сделок в месяц</label>
+        <input type="range" id="deals" min="10" max="500" step="10" value="80" oninput="calcLoss()">
+        <div class="range-val" id="deals-val">80 сделок</div>
+      </div>
+
+      <div>
+        <label class="field-label">Средний чек (₽)</label>
+        <input type="range" id="check" min="5000" max="500000" step="5000" value="30000" oninput="calcLoss()">
+        <div class="range-val" id="check-val">30 000 ₽</div>
+      </div>
+
+    </div>
+
+    <div class="calc-result-col">
+      <div class="result-metric">
+        <div class="metric-label">Теряете на рутине в месяц</div>
+        <div class="metric-val loss" id="loss-routine">200 000 ₽</div>
+        <div class="metric-note">Зарплата за время, потраченное не на продажи</div>
+      </div>
+      <div class="result-metric">
+        <div class="metric-label">Теряете сделок из-за медленных ответов</div>
+        <div class="metric-val loss" id="loss-deals">240 000 ₽</div>
+        <div class="metric-note">~10% сделок срываются из-за долгого ответа</div>
+      </div>
+      <div class="result-metric">
+        <div class="metric-label">Итого потерь в месяц</div>
+        <div class="metric-val loss" id="loss-total">440 000 ₽</div>
+      </div>
+      <div class="result-metric">
+        <div class="metric-label">Потенциальный рост выручки с AI</div>
+        <div class="metric-val gain" id="gain-total">+528 000 ₽</div>
+        <div class="metric-note">При ROI внедрения ×1.2</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL 3: CHAT ══ -->
+<div id="panel-chat" class="panel">
+  <h2 class="panel-title">AI-ассистент по продажам</h2>
+  <p class="panel-sub">Спроси как отработать возражение, как написать клиенту или как улучшить скрипт — отвечаю как опытный тренер по продажам</p>
+
+  <div class="chat-wrap">
+    <div class="chat-header">
+      <div class="chat-avatar">А</div>
+      <div class="chat-header-info">
+        <h4>AI-ассистент Альбины</h4>
+        <p>● онлайн</p>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg msg-ai">
+        <div class="msg-bubble">Привет! Я AI-ассистент по продажам. Спроси меня что угодно: как ответить на возражение, как написать клиенту после встречи, как увеличить конверсию. Попробуй! 👋</div>
+        <div class="msg-time">только что</div>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typing">
+      <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+    </div>
+
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" type="text" placeholder="Напр: клиент говорит «я подумаю», как ответить?" onkeydown="if(event.key==='Enter')sendChat()" />
+      <button class="chat-send" id="chat-send" onclick="sendChat()">Отправить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── TABS ──
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ── SCRIPT GENERATOR ──
+async function generateScript() {
+  const niche = document.getElementById('niche').value.trim();
+  if (!niche) { alert('Введи нишу бизнеса'); return; }
+
+  const type = document.getElementById('script-type').value;
+  const ctx = document.getElementById('context').value.trim();
+
+  const typeNames = {
+    incoming: 'входящего обращения клиента',
+    objection: 'работы с возражением «дорого»',
+    followup: 'follow-up после встречи',
+    upsell: 'допродажи существующему клиенту',
+    cold: 'холодного сообщения в WhatsApp'
+  };
+
+  const prompt = `Ты опытный тренер по продажам. Напиши конкретный, готовый к использованию скрипт для менеджера по продажам.
+
+Ниша: ${niche}
+Тип скрипта: ${typeNames[type]}
+${ctx ? `Контекст: ${ctx}` : ''}
+
+Требования:
+- Скрипт должен быть живым, разговорным, не корпоративным
+- Включи 2-3 варианта фраз для ключевых моментов
+- Добавь примечания для менеджера [в скобках]
+- Объём: 150-250 слов
+- Пиши только скрипт, без вступлений и объяснений`;
+
+  document.getElementById('gen-btn').disabled = true;
+  document.getElementById('script-loading').classList.add('show');
+  document.getElementById('script-result').classList.remove('show');
+
+  try {
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: 'Ты опытный тренер по продажам. Отвечай только на русском языке.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Ошибка генерации. Попробуй ещё раз.';
+    document.getElementById('script-output').textContent = text;
+    document.getElementById('script-result').classList.add('show');
+  } catch(e) {
+    document.getElementById('script-output').textContent = 'Ошибка соединения. Попробуй ещё раз.';
+    document.getElementById('script-result').classList.add('show');
+  }
+
+  document.getElementById('script-loading').classList.remove('show');
+  document.getElementById('gen-btn').disabled = false;
+}
+
+function copyScript() {
+  const text = document.getElementById('script-output').textContent;
+  navigator.clipboard.writeText(text);
+  const btn = document.querySelector('.copy-btn');
+  btn.textContent = 'Скопировано ✓';
+  setTimeout(() => btn.textContent = 'Копировать', 2000);
+}
+
+// ── CALCULATOR ──
+function fmt(n) {
+  return new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
+}
+
+function calcLoss() {
+  const managers = +document.getElementById('managers').value;
+  const salary   = +document.getElementById('salary').value;
+  const routine  = +document.getElementById('routine').value / 100;
+  const deals    = +document.getElementById('deals').value;
+  const check    = +document.getElementById('check').value;
+
+  document.getElementById('managers-val').textContent = managers + ' чел.';
+  document.getElementById('salary-val').textContent = new Intl.NumberFormat('ru-RU').format(salary) + ' ₽';
+  document.getElementById('routine-val').textContent = Math.round(routine*100) + '%';
+  document.getElementById('deals-val').textContent = deals + ' сделок';
+  document.getElementById('check-val').textContent = new Intl.NumberFormat('ru-RU').format(check) + ' ₽';
+
+  const lossRoutine = managers * salary * routine;
+  const lossDeals   = deals * check * 0.1;
+  const total       = lossRoutine + lossDeals;
+  const gain        = total * 1.2;
+
+  document.getElementById('loss-routine').textContent = fmt(lossRoutine);
+  document.getElementById('loss-deals').textContent   = fmt(lossDeals);
+  document.getElementById('loss-total').textContent   = fmt(total);
+  document.getElementById('gain-total').textContent   = '+' + fmt(gain);
+}
+
+calcLoss();
+
+// ── CHAT ──
+const chatHistory = [];
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const send = document.getElementById('chat-send');
+  input.value = '';
+  send.disabled = true;
+
+  addMessage(msg, 'user');
+  chatHistory.push({ role: 'user', content: msg });
+
+  document.getElementById('typing').classList.add('show');
+  scrollChat();
+
+  try {
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: 'Ты опытный тренер по продажам и бизнес-консультант. Отвечаешь коротко, конкретно и по делу — как опытный коллега, а не как учебник. Даёшь готовые фразы и реальные советы. Пишешь на русском языке. Максимум 150 слов в ответе.',
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Не удалось получить ответ.';
+    chatHistory.push({ role: 'assistant', content: reply });
+    document.getElementById('typing').classList.remove('show');
+    addMessage(reply, 'ai');
+  } catch(e) {
+    document.getElementById('typing').classList.remove('show');
+    addMessage('Ошибка соединения. Попробуй ещё раз.', 'ai');
+  }
+
+  send.disabled = false;
+  input.focus();
+}
+
+function addMessage(text, role) {
+  const wrap = document.getElementById('chat-messages');
+  const now = new Date().toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}`;
+  div.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${now}</div>`;
+  wrap.appendChild(div);
+  scrollChat();
+}
+
+function scrollChat() {
+  const wrap = document.getElementById('chat-messages');
+  setTimeout(() => wrap.scrollTop = wrap.scrollHeight, 50);
+}
+</script>
+</body>
+</html>
