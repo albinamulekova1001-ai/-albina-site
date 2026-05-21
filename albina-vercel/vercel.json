@@ -1,8 +1,22 @@
 {
   "version": 2,
+  "functions": {
+    "api/ai.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/demo", "dest": "/demo.html" },
-    { "src": "/", "dest": "/index.html" }
+    {
+      "src": "/api/ai",
+      "dest": "/api/ai.js"
+    },
+    {
+      "src": "/demo",
+      "dest": "/demo.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
+    }
   ]
 }
