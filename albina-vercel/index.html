@@ -126,11 +126,12 @@ body {
 
 @media (max-width: 700px) {
   .photo-container {
-    height: auto;
+    height: 100vh;
+    width: 100%;
   }
   .photo-container > img {
     width: 100%;
-    height: 75vw;
+    height: 100%;
     object-fit: cover;
     object-position: top center;
   }
@@ -679,9 +680,14 @@ footer {
 
 /* ── MOBILE ── */
 @media (max-width: 700px) {
-  .hero { grid-template-columns: 1fr; min-height: auto; background: #0a0a0a; }
-  .hero-left { padding: 60px 24px 40px; background: #0a0a0a; order: 2; }
-  .hero-right { order: 1; }
+  .hero { grid-template-columns: 1fr; min-height: 100vh; background: #0a0a0a; position: relative; }
+  .hero-left { 
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 32px 24px 48px; 
+    background: linear-gradient(to top, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.85) 60%, transparent 100%);
+    order: 2; z-index: 3;
+  }
+  .hero-right { order: 1; height: 100vh; width: 100%; }
   .section { padding: 70px 24px; }
   .numbers-bg { padding: 70px 24px; }
   .about-bg { padding: 70px 0; }
@@ -708,8 +714,8 @@ footer {
       Внедряю <em>AI</em><br>в ваш отдел<br>продаж
     </h1>
     <p class="hero-sub">Увеличиваю конверсию и освобождаю команду от рутины — с опытом топовых брендов Москвы</p>
-    <a href="#contact" class="hero-cta">Получить консультацию →</a>
-    <a href="/demo" class="hero-demo">✦ Попробовать AI-инструменты</a>
+    <a href="https://t.me/albinamulekova" target="_blank" class="hero-cta">Получить консультацию →</a>
+    <a href="demo.html" class="hero-demo">✦ Попробовать AI-инструменты</a>
   </div>
   <div class="hero-right">
     <div class="photo-container">
@@ -955,7 +961,7 @@ footer {
   <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,42px);font-weight:400;margin-bottom:16px;line-height:1.3;">Три AI-инструмента<br>для твоего бизнеса</h2>
   <p style="font-size:13px;color:var(--muted);max-width:460px;margin:0 auto 40px;line-height:1.8;">Генератор скриптов, калькулятор потерь и AI-ассистент по продажам — всё это я создаю для своих клиентов</p>
   <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-    <a href="/demo" style="background:var(--gold);color:var(--bg);padding:18px 40px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:background 0.3s;" onmouseover="this.style.background='#e8cc8a'" onmouseout="this.style.background='#c8a96e'">Открыть демо →</a>
+    <a href="demo.html" style="background:var(--gold);color:var(--bg);padding:18px 40px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:background 0.3s;" onmouseover="this.style.background='#e8cc8a'" onmouseout="this.style.background='#c8a96e'">Открыть демо →</a>
   </div>
 </div>
 
@@ -964,7 +970,7 @@ footer {
   <p class="label" style="justify-content:center;max-width:fit-content;margin:0 auto 24px;">Первый шаг</p>
   <h2 class="cta-title">Готовы узнать сколько денег<br>теряет ваш бизнес <em>прямо сейчас?</em></h2>
   <p class="cta-sub">Бесплатная консультация 30 минут — без обязательств</p>
-  <a href="#" class="btn-gold">Записаться на консультацию</a>
+  <a href="https://t.me/albinamulekova" target="_blank" class="btn-gold">Записаться на консультацию</a>
 </div>
 
 <footer>
